@@ -1,0 +1,110 @@
+logon to AWS
+Launch New Instance
+Settings:
+	1. Ubuntu 64
+	2. m4.xlarge
+	3. Next 
+	4. 40 GiB
+	5. Key-Name Value-Setup Machine
+	6. Name 'cloudera-ec2'
+		SSH - TCP - 22  - 0.0.0.0/0
+		All Traffic - Source=MyIP
+		All Traffic - Source=172.31.0.0/16 [Matching your VPC setup]
+	7. Launch
+		Create a new key pair
+		Enter a new key pair name [cloudera]
+		Download Key Pair and Save to Desktop
+	Launch Instances
+Go to the EC2 instances manager
+Copy the Setup Machine's Public DNS 
+
+
+Open the puttygen
+Click Load
+Select 'All Files (*.*)'
+Double click on the key pair file (.pem)
+Enter the passphrase, the name of the key pair
+Click Save Private Key and assign a name
+
+Open PuTTY
+Expand SSH
+Click Auth
+Click Browse 
+Double click on the new Private Key (.ppk)
+Click Session
+	Host Name= ubuntu@[Setup Machine's public dns]
+Open
+Click Yes on host key is not cached in the registry
+
+In the ssh/terminal session:
+Enter pair name
+
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get update
+wget http://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
+chmod +x cloudera-manager-installer.bin
+sudo ./cloudera-manager-installer.bin
+In the Cloudera Manager setup session:
+Next and Yes where necessary
+
+
+In a web browser navigate to [Setup Machine's public dns]:7180
+The Cloudera Manager logon should come up
+
+Back in the EC2 management page
+Launch Instance
+Settings:
+	1. Ubuntu 64
+	2. m4.large
+	3. Number of Instances = 3
+	4. 30 GiB
+	5. Key-Name Value-Cluster Machine
+	6. Select an existing security group
+		Check 'cloudera-ec2'
+	7. Launch
+		Choose an existing key pair
+		Select a key pair = Select the same as the Setup Machine's  [cloudera]
+		Click in the 'I acknowledge...'
+	Launch Instances
+
+
+Navigate to the EC2 management page
+Copy the Private IPs for each machine tagged 'Cluster Machine' 
+
+In a web browser navigate to [Setup Machine's public dns]:7180
+Logon as 'admin' using 'admin' for password
+Accept Terms
+1. Select Cloudera Express 
+   Click Continue
+  Click Continue on 'Thank you for choosing Cloudera Manager and CDH"
+2. On 'Specify hosts for your CDH cluster installation' enter each Private IP for each 'Cluster Machine', sepperated by a comma
+   Click Search
+   All 4 servers are found, Result says 'Host ready' with a green check box
+   Click Continue
+1. On 'Cluster Installation' click Continue
+2. Check on 'Install Oracle Java SE Development Kit'
+   Click Continue
+3. click Continue 
+4. On 'Provide SSH login credentials' 
+	Select Another user
+	Enter 'ubuntu' as the user
+	Select All hosts accept same private key
+	Click Browse
+	Double click on the .pem file
+	Enter the key pair name as the passpharse
+   Click Continue
+5. Click Continue
+6. This step is skipped by the wizard, goes straight to 7
+7. Click Continue after everything is downloaded and installed
+8. Click Finish
+
+
+
+Cluster Setup
+1. Select Core with Impala and click Continue
+2. Click Continue
+3. Click Test Connection
+   Click Continue 
+4. Click Continue
+
